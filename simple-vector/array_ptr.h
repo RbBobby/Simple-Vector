@@ -5,6 +5,10 @@ class ArrayPtr {
 public:
     // Инициализирует ArrayPtr нулевым указателем
     ArrayPtr() = default;
+    ArrayPtr(ArrayPtr<Type>&& rvalue_ptr) {
+        raw_ptr_ = std::move(rvalue_ptr);
+        rvalue_ptr = std::move(nullptr);
+    }
 
     // Создаёт в куче массив из size элементов типа Type.
     // Если size == 0, поле raw_ptr_ должно быть равно nullptr
@@ -32,6 +36,12 @@ public:
 
     // Запрещаем присваивание
     ArrayPtr& operator=(const ArrayPtr&) = delete;
+
+    ArrayPtr& operator=(ArrayPtr&& rvalue_ptr) {
+        if (this != rvalue_ptr) {
+            swap(rvalue_ptr);
+        }
+    };
 
     // Прекращает владением массивом в памяти, возвращает значение адреса массива
     // После вызова метода указатель на массив должен обнулиться

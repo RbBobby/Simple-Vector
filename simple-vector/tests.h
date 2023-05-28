@@ -38,7 +38,7 @@ inline void Test1() {
 
     // Инициализация вектора при помощи initializer_list
     {
-        SimpleVector<int> v{ 1, 2, 3 };
+        SimpleVector<int> v{1, 2, 3};
         assert(v.GetSize() == 3);
         assert(v.GetCapacity() == 3);
         assert(v[2] == 3);
@@ -51,10 +51,8 @@ inline void Test1() {
         try {
             v.At(3);
             assert(false);  // Ожидается выбрасывание исключения
-        }
-        catch (const std::out_of_range&) {
-        }
-        catch (...) {
+        } catch (const std::out_of_range&) {
+        } catch (...) {
             assert(false);  // Не ожидается исключение, отличное от out_of_range
         }
     }

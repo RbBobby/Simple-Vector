@@ -16,7 +16,6 @@ public:
         return capacity_to_reserve_;
     }
 };
-
 ReserveProxyObj Reserve(size_t capacity_to_reserve) {
     return ReserveProxyObj(capacity_to_reserve);
 }
@@ -214,6 +213,7 @@ public:
 
     // Удаляет элемент вектора в указанной позиции
     Iterator Erase(ConstIterator pos) {
+        assert(pos >= begin() && pos < end());
         std::move(const_cast<Iterator>(pos) + 1, end(), const_cast<Iterator>(pos));
         --size_;
         return const_cast<Iterator>(pos);
@@ -244,11 +244,14 @@ public:
 
     // Возвращает ссылку на элемент с индексом index
     Type& operator[](size_t index) noexcept {
+        assert(index < size_);
+
         return simple_vector_ptr_[index];
     }
 
     // Возвращает константную ссылку на элемент с индексом index
     const Type& operator[](size_t index) const noexcept {
+        assert(index < size_);
         return simple_vector_ptr_[index];
     }
 
