@@ -30,9 +30,7 @@ public:
 
     // Создаёт вектор из size элементов, инициализированных значением по умолчанию
     explicit SimpleVector(size_t size) : capacity_(size), size_(size), simple_vector_ptr_(size) {
-
         std::fill(begin(), end(), 0);
-
     }
 
     // Создаёт вектор из size элементов, инициализированных значением value
@@ -50,12 +48,9 @@ public:
     }
 
     SimpleVector(const SimpleVector& other) {
-        size_ = other.GetSize();
-        capacity_ = other.GetCapacity();
-        ArrayPtr<Type> arr_copy(other.size_);
-        std::copy(other.begin(), other.end(), arr_copy.Get());
-        arr_copy.swap(simple_vector_ptr_);
-
+        SimpleVector<Type> copy(other.size_);
+        std::copy(other.begin(), other.end(), copy.begin());
+        swap(copy);
     }
 
     SimpleVector(ReserveProxyObj new_capacity) {
@@ -75,11 +70,9 @@ public:
     //----------M-O-V-E---------------------
 
     SimpleVector(SimpleVector&& other) {
-        size_ = other.GetSize();
-        capacity_ = other.GetCapacity();
-        ArrayPtr<Type> arr_copy(other.size_);
-        std::move(other.begin(), other.end(), arr_copy.Get());
-        arr_copy.swap(simple_vector_ptr_);
+        SimpleVector<Type> copy(other.size_);
+        std::move(other.begin(), other.end(), copy.begin());
+        swap(copy);
         other.size_ = other.capacity_ = 0;
     }
 
@@ -160,9 +153,7 @@ public:
 
     Iterator Insert(ConstIterator pos, Type&& value) {
         assert(pos >= cbegin() && pos <= cend());
-
         auto pos_element = std::distance(cbegin(), pos);
-
         if (size_ < capacity_) {
             std::move_backward(begin() + pos_element, end(), begin() + size_ + 1);
             simple_vector_ptr_[pos_element] = std::move(value);
@@ -176,39 +167,15 @@ public:
             simple_vector_ptr_.swap(arr_ptr);
             capacity_ = new_capacity;
         }
-
         ++size_;
         return Iterator{ &simple_vector_ptr_[pos_element] };
     }
-    /*
-    Iterator Insert(ConstIterator pos, Type&& value) {
-        assert(pos >= cbegin() && pos <= cend());
-        auto pos_element = std::distance(cbegin(), pos);
-
-        if (size_ < capacity_) {
-            std::move_backward(begin() + pos_element, end(), begin() + size_ + 1);
-            simple_vector_ptr_[pos_element] = std::move(value);
-        }
-        else {
-            size_t new_capacity = NewCapacity();
-            SimpleVector<Type> arr_ptr;
-            arr_ptr.Reserve(new_capacity);
-            std::move(begin(), end(), arr_ptr.begin());
-            std::move_backward(begin() + pos_element, end(), begin() + size_ + 1);
-            arr_ptr[pos_element] = std::move(value);
-            std::move(arr_ptr.begin(), arr_ptr.end(), begin());
-            capacity_ = new_capacity;
-        }
-        ++size_;
-        return Iterator{ &simple_vector_ptr_[pos_element] };
-    }
-    */
+    
     // "Удаляет" последний элемент вектора. Вектор не должен быть пустым
     void PopBack() noexcept {
         if (size_ > 0) {
             --size_;
         }
-
     }
 
     // Удаляет элемент вектора в указанной позиции
@@ -224,7 +191,6 @@ public:
         std::swap(other.capacity_, capacity_);
         std::swap(other.size_, size_);
         other.simple_vector_ptr_.swap(simple_vector_ptr_);
-
     }
 
     // Возвращает количество элементов в массиве
@@ -245,7 +211,6 @@ public:
     // Возвращает ссылку на элемент с индексом index
     Type& operator[](size_t index) noexcept {
         assert(index < size_);
-
         return simple_vector_ptr_[index];
     }
 
@@ -276,7 +241,6 @@ public:
     // Обнуляет размер массива, не изменяя его вместимость
     void Clear() noexcept {
         size_ = 0;
-
     }
 
     // Изменяет размер массива.
@@ -286,7 +250,6 @@ public:
         if (new_size > capacity_) {
             SimpleVector copy(new_size);
             std::move(begin(), end(), copy.begin());
-
             while (i != new_size) {
                 copy[i] = std::move(Type());
                 ++i;
@@ -309,8 +272,6 @@ public:
             size_ = new_size;
         }
     }
-
-
 
     // Возвращает итератор на начало массива
     // Для пустого массива может быть равен (или не равен) nullptr
@@ -348,12 +309,9 @@ public:
         return &simple_vector_ptr_[size_];
     }
 private:
-
-
     size_t capacity_ = 0;
     size_t size_ = 0;
     ArrayPtr<Type> simple_vector_ptr_;
-
 
     size_t NewCapacity() {
         return capacity_ == 0 ? 1 : 2 * capacity_;
@@ -375,7 +333,6 @@ inline bool operator==(const SimpleVector<Type>& lhs, const SimpleVector<Type>& 
 
 template <typename Type>
 inline bool operator!=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
-
     return !(lhs == rhs);
 }
 
@@ -389,18 +346,15 @@ inline bool operator<(const SimpleVector<Type>& lhs, const SimpleVector<Type>& r
 
 template <typename Type>
 inline bool operator<=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
-
     return !(rhs < lhs);
 }
 
 template <typename Type>
 inline bool operator>(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
-
     return (rhs < lhs);
 }
 
 template <typename Type>
 inline bool operator>=(const SimpleVector<Type>& lhs, const SimpleVector<Type>& rhs) {
-
     return !(lhs < rhs);
 }
