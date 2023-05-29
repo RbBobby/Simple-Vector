@@ -6,8 +6,8 @@ public:
     // Инициализирует ArrayPtr нулевым указателем
     ArrayPtr() = default;
     ArrayPtr(ArrayPtr<Type>&& rvalue_ptr) {
-        raw_ptr_ = std::move(rvalue_ptr);
-        rvalue_ptr = std::move(nullptr);
+        this = std::exchange(rvalue_ptr, nullptr);
+        
     }
 
     // Создаёт в куче массив из size элементов типа Type.
@@ -41,6 +41,7 @@ public:
         if (this != rvalue_ptr) {
             swap(rvalue_ptr);
         }
+        return *this;
     };
 
     // Прекращает владением массивом в памяти, возвращает значение адреса массива

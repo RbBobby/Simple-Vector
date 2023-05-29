@@ -48,9 +48,11 @@ public:
     }
 
     SimpleVector(const SimpleVector& other) {
-        SimpleVector<Type> copy(other.size_);
-        std::copy(other.begin(), other.end(), copy.begin());
-        swap(copy);
+        if (this != &other) {
+            SimpleVector<Type> copy(other.size_);
+            std::copy(other.begin(), other.end(), copy.begin());
+            swap(copy);
+        }
     }
 
     SimpleVector(ReserveProxyObj new_capacity) {
@@ -70,10 +72,12 @@ public:
     //----------M-O-V-E---------------------
 
     SimpleVector(SimpleVector&& other) {
+        if (this != &other) {
         SimpleVector<Type> copy(other.size_);
         std::move(other.begin(), other.end(), copy.begin());
         swap(copy);
         other.size_ = other.capacity_ = 0;
+        }
     }
 
     SimpleVector& operator=(SimpleVector&& rhs) {
@@ -255,9 +259,6 @@ public:
                 ++i;
             }
             size_ = new_size;
-            //for (auto i = size_; i != new_size; ++i) {
-             //   std::move(Type());
-            //}
             capacity_ = new_size;
             swap(copy);
         }
